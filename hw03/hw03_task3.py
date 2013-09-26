@@ -17,15 +17,14 @@ result = 1      # Stores the final result of the calculation
 i = 2           # counts up through n and terminates the loop
 pos_sum = 1     
 neg_sum = 0
-print(result, end="")
+print(result, end=" ")
 while i <= n:
     if i % 2 == 0:
-        #evens
-        print(" -", i, end="")
+        print("-", i, end=" ")
         result -= i
         neg_sum += i
     else:
-        print(" +", i, end="")
+        print("+", i, end=" ")
         result += i
         pos_sum += i
     i += 1
