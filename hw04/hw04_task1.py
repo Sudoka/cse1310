@@ -41,13 +41,9 @@ print(fmt.format('Name', 'Melting Point (deg C)','Boiling Point (deg C)',
 	col1=col1, col2=col2, col3=col3))
 print(line)
 
-# define the data
-data = 	[ 	['Methane', -162.0, -183.0], 
-			['Ethane', -89.0, -172.0], 
-			['Propane', -42.0, -188.0],
-			['Butane', -0.5, -135.0]]
-
-fmt = '|{0[0]:<{col1}}|{0[1]:^{col2}.2f}|{0[2]:>{col3}.2f}|'
-for alkane in data:
-	print(fmt.format(alkane, col1=col1, col2=col2, col3=col3))
+fmt = '|{:<{col1}}|{:^{col2}.2f}|{:>{col3}.2f}|'
+print(fmt.format('Methane', -162.0, -183.0, col1=col1, col2=col2, col3=col3))
+print(fmt.format('Ethane', -89.0, -172.0, col1=col1, col2=col2, col3=col3))
+print(fmt.format('Propane', -42.0, -188.0, col1=col1, col2=col2, col3=col3))
+print(fmt.format('Butane', -0.5, -135.0, col1=col1, col2=col2, col3=col3))
 print(line)
