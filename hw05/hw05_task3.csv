@@ -35,7 +35,8 @@ else: if (x % 3) == 0:,,,,skip to else if (1) == 0 evals False,
 else: x = x - 1,,0,,skip to else decrement x,
 "print(count, x)",,,,prints count and x to the screen --->,4 0
 "L.append([count, x])","[[0, 12], [1, 6], [2, 2], [3, 1], [4, 0]]",,,create a new list containing 4 and 0. append it to L,
+count = count + 1,,,5,increment count,
 while x > 0:,,,,while comparison 0 > 0 evals False,
-"print(count, x)",,,,prints count and x to the screen --->,4 0
+"print(count, x)",,,,prints count and x to the screen --->,5 0
 "print(""L: "", L) ",,,,prints contents of L to the screen,"L:  [[0, 12], [1, 6], [2, 2], [3, 1], [4, 0]]"
 "print(""Bye"")",,,,prints bye to the screen,Bye
