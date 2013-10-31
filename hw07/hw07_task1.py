@@ -104,70 +104,159 @@ def print_table(table):
 
 	cols = len(table[0])
 	print_col_header(cols)
-	i = 0
 	for row in table:
-		print('|{: >4} '.format(table.index(row)), end='')
+		print('|{: >4} '.format(table.index(row) + 1), end='')
 		for cell in row:
 			print('|{: ^7.2f}'.format(cell), end='')
 		print('|')
 	print_hr(cols)
 	
-def save_table():
+def save_table(table, file_path):
 	''' save a table to disk. overwrites old version without prompting '''
-	pass
+	file_obj = None
+	try:
+		file_obj = open(file_path, mode='wt')
+	except IOError:
+		print('Error saving file...')
+	
+	for row in table:
+		for cell in row:
+			print(cell, sep='', end='', file=file_obj)
+			if row.index(cell) != len(row) - 1:
+				print(',', end='', file=file_obj)
+		print(file=file_obj)
+	file_obj.close()
 
-def save_table_as():
+def save_table_as(table):
 	''' save a table to disk under a different file name. prompts for overwrites '''
-	pass
+	file_path = input('Enter a new filename: ')
+	import os
+	if os.path.exists(file_path):
+		while True:
+			answer = input('This file already exists. Do you want to overwrite it (y/n)? ')
+			if answer.upper() == 'Y':
+				save_table(table, file_path)
+				return file_path
+			if answer.upper() == 'N':
+				return ''
+	else:
+		save_table(table, file_path)
+		return file_path
 
 def prompt_element():
 	''' prompts the user for a number or column entry '''
 	return input('Enter a row (as a number) or a column (as an uppercase letter): ')
 
-def get_element(element, is_row):
+def get_element(element, is_row, table):
 	''' takes a validated element and boolean that indicates whether the passed element is a 
 		row or a column. returns a list represeting the contents of the specified element. '''
-	pass
+	if is_row:
+		return table[element].copy()
+	else:
+		composite_element = []
+		for i in range(0, len(table)):
+			composite_element.append(table[i][element])
+		return composite_element
 
-def validate_element(element, table):
+def validation_error():
+	''' helper. prints an error message. returns (None, None) '''
+	print('Invalid selection')
+	return (None, None)
+
+def validate_element(element_string, table):
 	''' takes an unverified element as either a string or integer. 
 		returns a tuple containing a valid element index and boolean that indicates 
-		whether it represents a row or a column. returns None if the element would generate
-		an IndexError '''
+		whether it represents a row or a column. prints an error message and
+		returns a (None, None) tuple if the element would generate an IndexError '''
+
+	# convert element to a column number if nescessary or an integer if it refers to a row
 	is_row = None
+	element = None
 	try:
-		element = int(element)
+		element = int(element_string)
 	except ValueError:
 		# it could be a letter...
-		element = char_to_col_num(element)
+		element = char_to_col_num(element_string)
 		is_row = False
 	else:
+		element -= 1
 		is_row = True
-	
 
+	# throw out obvious errors
+	if is_row:
+		if element < 0 or element > len(table):
+			return validation_error()
+	else:
+		try:
+			table_len = len(table[0])
+		except IndexError:
+			table_len = 0
+		if element < 0 or element > table_len:
+			return validation_error()
 
-def get_minimum(table):
-	''' takes a table. promputs user for column or row entry. returns the minimum value across specified element. '''
-	element = prompt_element()
-	element, is_row = validate_element(element, table)
+	# test out the element to see if its valid. Guarantees no IndexErrors.
+	try:
+		if is_row:
+			table[element][0]
+		else:
+			table[0][element]
+	except IndexError:
+		return validation_error()
+	else:
+		return (element, is_row)
 
+def print_minimum(table):
+	''' takes a table. prompts user for column or row entry. returns the minimum value across specified element. '''
+	element, is_row = validate_element(prompt_element(), table)
+	if element == None:	
+		return
 
+	element = get_element(element, is_row, table)
+	minimum = element[0]
+	for number in element:
+		if number < minimum:
+			minimum = number
+	print('Minimum is:', minimum)
 
-def get_maximum():
-	''' takes a column or row. returns the maximum value across that element.'''
-	pass
+def print_maximum(table):
+	''' takes a table. prompts user for column or row entry. returns the maximum value across specified element. '''
+	element, is_row = validate_element(prompt_element(), table)
+	if element == None:	
+		return
 
-def delete_element():
-	''' takes a column or row. deletes that element '''
-	pass
+	element = get_element(element, is_row, table)
+	maximum = element[0]
+	for number in element:
+		if number > maximum:
+			maximum = number
+	print('Maximum is:', maximum)
 
-def sum_element():
+def delete_element(table):
+	''' takes a table. prompts user for column or row entry. deletes the specified element from the table. '''
+	element, is_row = validate_element(prompt_element(), table)	
+	if element == None:	
+		return
+
+	if is_row:
+		del table[element]
+	else:
+		for row in table:
+			del row[element]
+
+def print_sum(table):
 	''' takes a column or row. returns the sum of those elements '''
-	pass
+	element, is_row = validate_element(prompt_element(), table)	
+	if element == None:	
+		return
+	
+	element = get_element(element, is_row, table)
+	my_sum = 0
+	for number in element:
+		my_sum += number
+	print('The sum is:', my_sum)
 
 def main():
 	''' main function. executes all other functions '''
-	import os
 	table = []
 	table_path = ''
 
@@ -179,6 +268,20 @@ def main():
 			quit()
 		elif choice == 1:
 			table, table_path = open_file()
+		elif choice == 2:
+			print_minimum(table)
+		elif choice == 3:
+			print_maximum(table)
+		elif choice == 4:
+			print_sum(table)
+		elif choice == 5:
+			delete_element(table)
+		elif choice == 6:
+			save_table(table, table_path)
+		elif choice == 7:
+			new_path = save_table_as(table)
+			if new_path != '':
+				table_path = new_path
 		else:
 			print("Invalid selection")
 
